@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tag;
 use App\Models\Article;
 use Illuminate\Http\Request;
 
@@ -29,7 +30,8 @@ class ArticleController extends Controller
      */
     public function create()
     {
-        return view('article.create');
+        $tags = Tag::all();
+        return view('article.create', compact('tags'));
     }
 
     /**
@@ -38,10 +40,16 @@ class ArticleController extends Controller
     public function store(Request $request)
     {
         //mass assigmet
-        Article::create([
+        $article = Article::create([
             'title'=> $request->title,
             'body' => $request->body,
             'img' => $request->has('img') ? $request->file('img')->store('public/img') : 'img/default-image.jpg',]);
+
+            $article
+            ->tags() // Qui sto utilizzando il metodo di relazione Many to many che ho definito nel modello
+                    // Compio questa operazione quando devo SCRIVERE nel DB
+
+            ->attach($request->tags); // Con il metodo attach gli passo gli ID degli oggetti che voglio mettere in relazione al modello di partenza
 
 
         return redirect()->back()->with('message', 'Articolo creato con successo');
@@ -62,7 +70,8 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        return view('article.edit', compact('article'));
+        $tags = Tag::all();
+        return view('article.edit', compact('article', 'tags'));
     }
 
     /**
@@ -83,6 +92,8 @@ class ArticleController extends Controller
             'img' => $img
         ]);
 
+        $article->tags()->sync($request->tags); //aggiorna la relazione de nuoi tags selezionati
+
         return redirect(route('index'))->with('message', 'articolo modificato'); //ritorno all pagina index degli articoli
 
     }
@@ -92,6 +103,8 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
+        $article->tags()->detach();
+
         $article->delete();
 
         return redirect()->back()->with('message', 'articolo eliminato');

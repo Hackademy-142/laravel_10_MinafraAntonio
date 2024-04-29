@@ -20,7 +20,8 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return view('article.index');
+        $articles = Article::all();
+        return view('article.index', compact('articles'));
     }
 
     /**
@@ -40,7 +41,7 @@ class ArticleController extends Controller
         Article::create([
             'title'=> $request->title,
             'body' => $request->body,
-            'img' => $request->has('img') ? $request->file('img')->store('public/img') : 'pic/default.png',]);
+            'img' => $request->has('img') ? $request->file('img')->store('public/img') : 'img/default-image.jpg',]);
 
 
         return redirect()->back()->with('message', 'Articolo creato con successo');
@@ -52,6 +53,8 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
+        return view('article.show' , compact('article'));
+
     }
 
     /**
@@ -59,7 +62,7 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        //
+        return view('article.edit', compact('article'));
     }
 
     /**
@@ -67,7 +70,21 @@ class ArticleController extends Controller
      */
     public function update(Request $request, Article $article)
     {
-        //
+        if($request->file('img')){
+            $img = $request->file('img')->store('public/img');
+        }
+        else{
+            $img = $article->img;
+        }
+
+        $article->update([
+            'title' => $request->title,
+            'body' => $request->body,
+            'img' => $img
+        ]);
+
+        return redirect(route('index'))->with('message', 'articolo modificato'); //ritorno all pagina index degli articoli
+
     }
 
     /**
@@ -75,6 +92,8 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        //
+        $article->delete();
+
+        return redirect()->back()->with('message', 'articolo eliminato');
     }
 }

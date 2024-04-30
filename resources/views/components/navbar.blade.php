@@ -26,16 +26,32 @@
         @endguest
 
         @auth
-        <li>
-          <form action="{{route('logout')}}" method="post">
-            @csrf
-            <button class="dropdown-item" type="submit">Logout</button>
-          </form>
+        <li class="nav-item">
+          <a class="nav-link" href="{{route('becomeLessor')}}">Diventa un locatore</a>
         </li>
-        @endauth
 
+        @if (Auth::user()->is_lessor)
+        <li class="nav-item">
+          <a class="nav-link" href="{{route('announcements.create')}}">Inserisci un nuovo annuncio</a>
+        </li>
+        @endif
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{Auth::user()->name}}
+          </a>
+          <ul class="dropdown-menu">
+            @if (Auth::user()->is_admin)
+            <li><a class="nav-link" href="{{route('dashboard')}}">Amministrazione</a></li>
+            @endif
 
-      </ul>
-    </div>
-  </div>
-</nav>
+            <li>
+              <form action="{{route('logout')}}" method="post">
+                @csrf
+                <button class="nav-link" type="submit">Logout</button>
+              </form>
+            </li>
+            @endauth
+          </ul>
+        </div>
+      </div>
+    </nav>

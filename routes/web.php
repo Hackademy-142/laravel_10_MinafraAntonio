@@ -1,10 +1,23 @@
 <?php
 
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\PublicController;
+use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [ArticleController::class, 'home'])->name('home');
+//publiccontroller
+Route::get('/', [PublicController::class, 'home'])->name('home');
 
+Route::get('/became-lessor', [PublicController::class, 'becomeLessore'])->name('becomeLessor');
+
+Route::post('/become-lessor/submit', [PublicController::class, 'becomeLessorSubmit'])->name('becomeLessorSubmit')->middleware('auth');
+
+Route::get('dashboard', [PublicController::class, 'dashboard'])->name('dashboard')->middleware('auth');
+
+Route::post('accept/request/{user}', [PublicController::class, 'acceptRequest'])->name('acceptRequest')->middleware('auth');
+
+
+//articlecontroller
 Route::get('/index', [ArticleController::class, 'index'])->name('index');
 
 Route::get('/create', [ArticleController::class, 'create'])->name('article.create');
